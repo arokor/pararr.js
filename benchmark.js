@@ -30,7 +30,6 @@ var p = require('./lib/pararr'),
 		}
 		for (i = Math.ceil(Math.sqrt(a)) ; i > 1; i--) {
 			if (a % i === 0) {
-				console.log(i);
 				return false;
 			}
 		}
