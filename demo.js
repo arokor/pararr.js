@@ -41,7 +41,7 @@ p.map(arr, fac, function(err, res) {
 
 	// Parallel filter
 	p.filter(arr, isPrime, function(err, res) {
-		console.log('Parallel map returned: ' + res);
+		console.log('Parallel filter returned: ' + res);
 		
 		p.destroy(); //Cleanup
 	});	
