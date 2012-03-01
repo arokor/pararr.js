@@ -9,7 +9,7 @@ var p = require('./lib/pararr'),
 
 	arr = [1,2,3,4,5,6,7,8,9,10],
 
-	// Imperformant factorial funciton
+	// Inperformant factorial funciton
 	fac = function(a) {
 		return (function facI(a) {
 			if (a === 1) {
@@ -20,7 +20,7 @@ var p = require('./lib/pararr'),
 		})(a);
 	},
 	
-	// Imperformant primality check
+	// Inperformant primality check
 	isPrime = function(a) {
 		var i;
 		if (a <= 2) {
