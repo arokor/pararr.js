@@ -25,7 +25,7 @@ exports.map = {
 				test.throws(function() {
 					p.map(arr, function(a){return a*2;});
 				}, 'Expected Exception due to missing callback');
-					
+
 				test.done();
 			});
 		});
