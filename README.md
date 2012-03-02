@@ -76,7 +76,7 @@ __Arguments__
 ---------------------------------------
 
 <a name="filter"/>
-### map( arr, iter(a), callback(err, result) )
+### filter( arr, iter(a), callback(err, result) )
   
 Filter an an array
 
