@@ -74,7 +74,7 @@ function benchmark(op, arrLen, iter, iterName, cb) {
 
 	// Generate test data
 	for (i = 0; i < arrLen; i++) {
-		arr.push(Math.floor(Math.random() * 10000));
+		arr.push(Math.floor(Math.random() * 15000));
 	}
 		
 	// Benchmark built in map function

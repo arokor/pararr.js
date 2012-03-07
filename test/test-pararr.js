@@ -214,15 +214,58 @@ exports.init = {
 };
 
 exports.exec = {
-	testExec : function(test) {
-		var func = function() {
-				return 123;
-			},
+	testSequential : function(test) {
+		var f0 = function() { return 123-20+20; },
+			f1 = function() { return 123; },
+			f2 = function() { return 123*2/2; },
+			f3 = function() { return 123+5-5; },
 			exp = 123;
 
-		p.exec(func, function(err, act) {
+		p.exec(f0, function(err, act) {
 			test.strictEqual(act, exp, 'Incorrect exec() result');
-			test.done();
+				p.exec(f1, function(err, act) {
+					test.strictEqual(act, exp, 'Incorrect exec() result');
+					p.exec(f2, function(err, act) {
+						test.strictEqual(act, exp, 'Incorrect exec() result');
+						p.exec(f3, function(err, act) {
+							test.strictEqual(act, exp, 'Incorrect exec() result');
+							test.done();
+						});
+					});
+				});
+		});
+	},
+
+	testParallel : function(test) {
+		var f0 = function() { return 123-20+20; },
+			f1 = function() { return 123; },
+			f2 = function() { return 123*2/2; },
+			f3 = function() { return 123+5-5; },
+			exp = 123,
+			count = 0;
+
+		function cb() {
+			count++;
+			if (count === 4) {
+				test.done();
+			}
+		}
+
+		p.exec(f0, function(err, act) {
+			test.strictEqual(act, exp, 'Incorrect exec() result');
+			cb();
+		});
+		p.exec(f1, function(err, act) {
+			test.strictEqual(act, exp, 'Incorrect exec() result');
+			cb();
+		});
+		p.exec(f2, function(err, act) {
+			test.strictEqual(act, exp, 'Incorrect exec() result');
+			cb();
+		});
+		p.exec(f3, function(err, act) {
+			test.strictEqual(act, exp, 'Incorrect exec() result');
+			cb();
 		});
 	}
 };
