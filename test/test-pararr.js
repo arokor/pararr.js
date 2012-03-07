@@ -117,7 +117,7 @@ exports.filter = {
 			exp;
 		
 		function testFilter(arr, iter, cb) {
-			exp = arr.filter(iter); //native map
+			exp = arr.filter(iter); //native filter
 			p.filter(arr, iter, function(err, act) {
 				test.ifError(err);
 				test.ok(arrays_equal(act, exp), 'Expected ' + exp + ' but got ' + act);
@@ -172,6 +172,60 @@ exports.filter = {
 		p.filter(arr3, iter, createCallback(exp3));
 	}
 }
+
+
+// Test many initializations
+exports.init = {
+	testMany: function (test) {
+		var iter = function(a){return a % 2 === 0;},
+			exp;
+		
+		function testFilter(arr, iter, cb) {
+			exp = arr.filter(iter); //native filter
+			p.filter(arr, iter, function(err, act) {
+				test.ifError(err);
+				test.ok(arrays_equal(act, exp), 'Expected ' + exp + ' but got ' + act);
+				cb();
+			});
+		}
+		
+		testFilter([], iter, function() {
+			p.destroy();
+			testFilter([1,5], iter, function() {
+				p.destroy();
+				testFilter([5], iter, function() {
+					p.destroy();
+					testFilter([1,9,7,6,5,1], iter, function() {
+						p.destroy();
+						testFilter([1,9,7,6,5,1,3], iter, function() {
+							p.destroy();
+							testFilter([3,5,6,1,1,5,9,7], iter, function() {
+								p.destroy();
+								testFilter([2,3,1,6,1,9,7,5,3,2,1,5,6,1,5,6,3,2,3,5,6,1,1,5,9,7], iter, function() {
+									test.done();
+								});
+							});
+						});
+					});
+				});
+			});
+		});
+	}
+};
+
+exports.exec = {
+	testExec : function(test) {
+		var func = function() {
+				return 123;
+			},
+			exp = 123;
+
+		p.exec(func, function(err, act) {
+			test.strictEqual(act, exp, 'Incorrect exec() result');
+			test.done();
+		});
+	}
+};
 
 //Finaly call destroy to free resources
 exports.finalize = function (test) {
