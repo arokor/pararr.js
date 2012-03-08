@@ -43,7 +43,38 @@ p.map(arr, fac, function(err, res) {
 	p.filter(arr, isPrime, function(err, res) {
 		console.log('Parallel filter returned: ' + res);
 		
-		p.destroy(); //Cleanup
+		// Parallel execution
+		p.parallel(
+			[
+				{
+					func : fac,
+					par : 3
+				},
+				{
+					func : fac,
+					par : 4
+				},
+				{
+					func : fac,
+					par : 5
+				},
+				{
+					func : fac,
+					par : 6
+				},
+				{
+					func : fac,
+					par : 7
+				}
+			],
+			function(result) {
+				var facsum = result.reduce(function(acc, val) {
+					return acc + val;
+				});
+				console.log('Sum of factorials: ' + facsum);
+				p.destroy(); //Cleanup
+			}
+		);
 	});	
 });
 

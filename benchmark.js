@@ -60,8 +60,8 @@ function arrays_equal(a,b) {
 	return !!a && !!b && !(a<b || b<a);
 }
 
-// Measure and output time required for paralell and normal operations
-function benchmark(op, arrLen, iter, iterName, cb) {
+// Measure and output time required for paralell and normal array operations
+function benchmarkArrFunc(op, arrLen, iter, iterName, cb) {
 	var t1, t2, //Timers
 		r1, r2, //Results
 		i;
@@ -99,15 +99,73 @@ function benchmark(op, arrLen, iter, iterName, cb) {
 	});
 }
 
-benchmark('map', 10000, fac, 'factorial', function() {
-	benchmark('map', 10000, x2, 'x^2', function() {
-		benchmark('filter', 100000, isPrime, 'isPrime', function() {
-			benchmark('filter', 100000, isEven, 'isEven', function() {
+//benchmarkArrFunc('map', 10000, fac, 'factorial', function() {
+//	benchmarkArrFunc('map', 10000, x2, 'x^2', function() {
+//		benchmarkArrFunc('filter', 100000, isPrime, 'isPrime', function() {
+//			benchmarkArrFunc('filter', 100000, isEven, 'isEven', function() {
+				// Benchmark parallel
+				var t1 = createTimer(),
+					t2 = createTimer(), //Timers
+					x = 12345678912345678; 
+				
+				p.init();
+				console.log('\nBenchmarking parallel (this may take some time)');
 
-			});
-		});
-	});
-});
+				// Sequential execution of 6 isPrime
+				t1.start();
+				isPrime(x);
+				isPrime(x);
+				isPrime(x);
+				isPrime(x);
+				isPrime(x);
+				isPrime(x);
+				t1.stop();
+
+				console.log('Sequential execution: ' + t1.time() + 'ms');
+
+
+				// Parallel execution of 6 isPrime
+				t2.start();
+				p.parallel(
+					[
+						{
+							func: isPrime,
+							par: x
+						},
+						{
+							func: isPrime,
+							par: x
+						},
+						{
+							func: isPrime,
+							par: x
+						},
+						{
+							func: isPrime,
+							par: x
+						},
+						{
+							func: isPrime,
+							par: x
+						},
+						{
+							func: isPrime,
+							par: x
+						}
+					],
+
+					// Callback
+					function(err, result) {
+						t2.stop();
+						console.log('Parallel execution: ' + t2.time() + 'ms');
+						
+						p.destroy(); // Cleanup
+					}
+				);
+//			});
+//		});
+//	});
+//});
 
 
 
