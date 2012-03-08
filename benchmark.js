@@ -99,10 +99,10 @@ function benchmarkArrFunc(op, arrLen, iter, iterName, cb) {
 	});
 }
 
-//benchmarkArrFunc('map', 10000, fac, 'factorial', function() {
-//	benchmarkArrFunc('map', 10000, x2, 'x^2', function() {
-//		benchmarkArrFunc('filter', 100000, isPrime, 'isPrime', function() {
-//			benchmarkArrFunc('filter', 100000, isEven, 'isEven', function() {
+benchmarkArrFunc('map', 10000, fac, 'factorial', function() {
+	benchmarkArrFunc('map', 10000, x2, 'x^2', function() {
+		benchmarkArrFunc('filter', 100000, isPrime, 'isPrime', function() {
+			benchmarkArrFunc('filter', 100000, isEven, 'isEven', function() {
 				// Benchmark parallel
 				var t1 = createTimer(),
 					t2 = createTimer(), //Timers
@@ -111,10 +111,8 @@ function benchmarkArrFunc(op, arrLen, iter, iterName, cb) {
 				p.init();
 				console.log('\nBenchmarking parallel (this may take some time)');
 
-				// Sequential execution of 6 isPrime
+				// Sequential execution of 4 isPrime
 				t1.start();
-				isPrime(x);
-				isPrime(x);
 				isPrime(x);
 				isPrime(x);
 				isPrime(x);
@@ -124,18 +122,10 @@ function benchmarkArrFunc(op, arrLen, iter, iterName, cb) {
 				console.log('Sequential execution: ' + t1.time() + 'ms');
 
 
-				// Parallel execution of 6 isPrime
+				// Parallel execution of 4 isPrime
 				t2.start();
 				p.parallel(
 					[
-						{
-							func: isPrime,
-							par: x
-						},
-						{
-							func: isPrime,
-							par: x
-						},
 						{
 							func: isPrime,
 							par: x
@@ -162,10 +152,10 @@ function benchmarkArrFunc(op, arrLen, iter, iterName, cb) {
 						p.destroy(); // Cleanup
 					}
 				);
-//			});
-//		});
-//	});
-//});
+			});
+		});
+	});
+});
 
 
 
