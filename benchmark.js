@@ -147,7 +147,7 @@ benchmarkArrFunc('map', 10000, fac, 'factorial', function() {
 					// Callback
 					function(err, result) {
 						t2.stop();
-						console.log('Parallel execution: ' + t2.time() + 'ms');
+						console.log('Parallel execution: ' + t2.time() + 'ms' + (t2.time() < t1.time() ? ' - faster' : ' - slower'));
 						
 						p.destroy(); // Cleanup
 					}
