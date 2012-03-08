@@ -214,20 +214,62 @@ exports.init = {
 };
 
 exports.exec = {
-	testSequential : function(test) {
+	testExecError : function(test) {
+		p.exec(function(a) { throw Error('test'); }, 4, function(err, act) {
+			test.ok(err !== null, 'Expected error');
+			test.strictEqual(act, null, 'Expected null');
+			p.exec(function(a) { throw Error('test'); }, 2, function(err, act) {
+				test.ok(err !== null, 'Expected error');
+				test.strictEqual(act, null, 'Expected null');
+				p.exec(function(a) { throw Error('test'); }, 5, function(err, act) {
+					test.ok(err !== null, 'Expected error');
+					test.strictEqual(act, null, 'Expected null');
+					p.exec(function(a) { throw Error('test'); }, 2, function(err, act) {
+						test.ok(err !== null, 'Expected error');
+						test.strictEqual(act, null, 'Expected null');
+						p.exec(function(a) { throw Error('test'); }, 1, function(err, act) {
+							test.ok(err !== null, 'Expected error');
+							test.strictEqual(act, null, 'Expected null');
+							test.done();
+						});
+					});
+				});
+			});
+		});
+	},
+	testInvalidInput : function(test) {
+		p.exec('dummy', 1, function(err, act) { //first arg not a fkn
+			test.ok(err !== null, 'Expected error');
+			p.exec(function(a) {return a;}, function(){}, function(err, act) { //par is a fkn
+				test.ok(err !== null, 'Expected error');
+				test.throws(function() {
+					p.exec(function(a) {return a;}, 0);
+				}, 'Expected thrown error due to missing callback');
+				test.done();
+			});
+		});
+	},
+	testNoPar : function(test) {
+		p.exec(function() {return 1;}, function(err, act) {
+			test.ifError(err, 'Did not expect error here');
+			test.strictEqual(act, 1, 'Incorrect exec() result');
+			test.done();
+		});
+	},
+	testSequentialExec : function(test) {
 		var f0 = function() { return 123-20+20; },
 			f1 = function() { return 123; },
 			f2 = function() { return 123*2/2; },
 			f3 = function() { return 123+5-5; },
 			exp = 123;
 
-		p.exec(f0, function(err, act) {
+		p.exec(f0, 0, function(err, act) {
 			test.strictEqual(act, exp, 'Incorrect exec() result');
-				p.exec(f1, function(err, act) {
+				p.exec(f1, 0, function(err, act) {
 					test.strictEqual(act, exp, 'Incorrect exec() result');
-					p.exec(f2, function(err, act) {
+					p.exec(f2, 0, function(err, act) {
 						test.strictEqual(act, exp, 'Incorrect exec() result');
-						p.exec(f3, function(err, act) {
+						p.exec(f3, 0, function(err, act) {
 							test.strictEqual(act, exp, 'Incorrect exec() result');
 							test.done();
 						});
@@ -236,11 +278,11 @@ exports.exec = {
 		});
 	},
 
-	testParallel : function(test) {
-		var f0 = function() { return 123-20+20; },
-			f1 = function() { return 123; },
-			f2 = function() { return 123*2/2; },
-			f3 = function() { return 123+5-5; },
+	testParallelExec : function(test) {
+		var f0 = function(a) { return 123-20+20+a-a; },
+			f1 = function(a) { return 123+a-a; },
+			f2 = function(a) { return 123*2/2+a-a; },
+			f3 = function(a) { return 123+5-5+a-a; },
 			exp = 123,
 			count = 0;
 
@@ -251,22 +293,100 @@ exports.exec = {
 			}
 		}
 
-		p.exec(f0, function(err, act) {
+		p.exec(f0, 3, function(err, act) {
 			test.strictEqual(act, exp, 'Incorrect exec() result');
 			cb();
 		});
-		p.exec(f1, function(err, act) {
+		p.exec(f1, 9, function(err, act) {
 			test.strictEqual(act, exp, 'Incorrect exec() result');
 			cb();
 		});
-		p.exec(f2, function(err, act) {
+		p.exec(f2, 6, function(err, act) {
 			test.strictEqual(act, exp, 'Incorrect exec() result');
 			cb();
 		});
-		p.exec(f3, function(err, act) {
+		p.exec(f3, 4, function(err, act) {
 			test.strictEqual(act, exp, 'Incorrect exec() result');
 			cb();
 		});
+	},
+
+	testParallel : function(test) {
+		var a = [123,234,345,456],
+			f = function(a) {
+				var i, j;
+				for(i=0; i<12345; i++) {
+					j += i /1234;
+				}
+				return a;
+			}; 
+
+		p.parallel(
+			[
+				{
+					func : function(par) {
+						var i, j;
+						for(i=0; i<100000; i++) {
+							j += i /1234;
+						}
+						return par.a;
+					},
+					par : {
+						a : a[0]
+					}
+				},
+				{
+					func : function(par) {
+						var i, j;
+						for(i=0; i<30000; i++) {
+							j += i /1234;
+						}
+						return par.a;
+					},
+					par : {
+						a : a[1]
+					}
+				},
+				{
+					func : function(par) {
+						var i, j;
+						for(i=0; i<12000; i++) {
+							j += i /1234;
+						}
+						return par.a;
+					},
+					par : {
+						a : a[2]
+					}
+				},
+				{
+					func : function(par) {
+						var i, j;
+						for(i=0; i<1000; i++) {
+							j += i /1234;
+						}
+						return par.a;
+					},
+					par : {
+						a : a[3]
+					}
+				},
+				{
+					func : f,
+					par : 'test'
+				}
+			],
+
+			// Callback
+			function(result) {
+				test.strictEqual(result[0], a[0], 'Incorrect parallel result');
+				test.strictEqual(result[1], a[1], 'Incorrect parallel result');
+				test.strictEqual(result[2], a[2], 'Incorrect parallel result');
+				test.strictEqual(result[3], a[3], 'Incorrect parallel result');
+				test.strictEqual(result[4], 'test', 'Incorrect parallel result');
+				test.done();
+			}
+		);	
 	}
 };
 
