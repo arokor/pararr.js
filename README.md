@@ -1,6 +1,6 @@
-#Pararr.js - Parallel array operations for Node
+#Pararr.js - Parallel computing for Node
 
-Modern multicore systems can process lots of data in parallel but writing parallel code can be tricky. Pararr.js provides parallel implementations of standard array functions like *map* or *filter* that utilize all cores in the system to calculate their result.
+Modern multicore systems can process lots of data in parallel but writing parallel code can be tricky. Pararr.js provides an easy to use API for parallel computating in Node and parallel implementations of standard array functions like *map* or *filter* that utilize all cores in the system when calculating their result.
 
 ##Usage
     var p = require('./lib/pararr'),
@@ -33,6 +33,8 @@ Outputs:
 
     Parallel filter returned: 1,2,3,5,7
     
+See *benchmark.js* for more examples
+
 ##Demo / Benchmark
 To run demo:
 
@@ -44,14 +46,16 @@ To run benchmark:
 
 ##API
 * [init](#init)
+* [exec](#exec)
+* [parallel](#parallel)
 * [map](#map)
 * [filter](#filter)
 * [destroy](#destroy)
 
 ##Considerations
-Pararr creates a V8 instance for each CPU core. This effects memory consumption and startup time.
+Pararr creates a V8 instance for each CPU core which has an effect memory consumption and startup time. When a calculation is dispatched to a worker the function and its data is copied and sent to the corresponding instance which causes an shorter or longer delay depending mainly on the data volume. Generally speaking we can benefit from parallelization in this form when data volumes are small and CPU cycles is a bottleneck.
 
-Partitioning the input data and transporting it to the workers takes time (O(n)), so if the iterator function is fast (O(1)) parallelization won't have a positive effect on performance. However, if the iterator function is slow we can benefit greatly from parallel processing. See *benchmark.js* for examples of good and bad use cases.
+For array functions such as *map* or *filter* the partitioning of the input data and transporting it to the workers takes time (O(n)), so if the iterator function is fast (O(1)) parallelization won't have a positive effect on performance. However, if the iterator function is slow we can benefit greatly from parallel processing. See *benchmark.js* for examples of good and bad use cases.
 
 ##Functions
 
@@ -59,6 +63,31 @@ Partitioning the input data and transporting it to the workers takes time (O(n))
 ### init()
 
 Initializes Pararr. If this function isn't called, Pararr will be initialized lazily
+
+---------------------------------------
+
+<a name="exec"/>
+### exec( func(par), par, callback(err, result) )
+  
+Execute function func with parameter when a CPU becomes free and return the result in callback.
+
+__Arguments__
+
+    func     {Function} Function to be executed
+    par      {Object|Number|String} parameter with which func will be called
+    callback {Function} Callback called when finished.
+
+---------------------------------------
+
+<a name="parallel"/>
+### parallel( funcs, callback(result) )
+  
+Execute a number of functions in parallel. When all functions have returned callback returns an array containing the results.
+
+__Arguments__
+
+    funcs    {Array} Array of functions to be executed. Each elements is an object containing a function *func* and a parameter *par*
+    callback {Function} Callback called when finished. Results are returned in form of an array with the same indexing as funcs.
 
 ---------------------------------------
 
