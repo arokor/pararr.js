@@ -1,6 +1,6 @@
 #Pararr.js - Parallel computing for Node
 
-Modern multicore systems can process lots of data in parallel but writing parallel code can be tricky. Pararr.js provides an easy to use API for parallel computating in Node and parallel implementations of standard array functions like *map* or *filter* that utilize all cores in the system when calculating their result.
+Modern multicore systems can process lots of data in parallel but writing parallel code can be tricky. Pararr.js provides an easy-to-use API for parallel computing in Node and parallel implementations of standard array functions like *map* or *filter* that utilize all available cores in the system when calculating their result.
 
 ##Usage
     var p = require('./lib/pararr'),
@@ -69,7 +69,7 @@ Initializes Pararr. If this function isn't called, Pararr will be initialized la
 <a name="exec"/>
 ### exec( func(par), par, callback(err, result) )
   
-Execute function func with parameter when a CPU becomes free and return the result in callback.
+Execute function func with parameter par when a CPU becomes free and return the result in callback.
 
 __Arguments__
 
