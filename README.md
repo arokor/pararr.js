@@ -2,8 +2,11 @@
 
 Modern multicore systems can process lots of data in parallel but writing parallel code can be tricky. Pararr.js provides an easy-to-use API for parallel computing in Node and parallel implementations of standard array functions like *map* or *filter* that utilize all available cores in the system when calculating their result.
 
+##Installation
+	npm install pararr
+
 ##Usage
-    var p = require('./lib/pararr'),
+    var p = require('pararr'),
     
         arr = [1,2,3,4,5,6,7,8,9,10],
     	

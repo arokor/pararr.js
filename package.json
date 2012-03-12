@@ -1,6 +1,6 @@
 {
   "author": "Aron Kornhall <arokor@kornhall.se>",
-  "name": "pararr.js",
+  "name": "pararr",
   "description": "Parallel computing for Node",
   "keywords": [
     "parallel",
@@ -27,11 +27,11 @@
   "dependencies": {},
   "devDependencies": {
     "nodeunit": "0.7.x"
-  }
+  },
   "licences" : [
     {
       "type" : "MIT License",
-      "url" : "https://github.com/arokor/pararr.js/blob/master/license.txt"
+      "url" : "https://raw.github.com/arokor/pararr.js/master/license.txt"
     }
   ]
 }
