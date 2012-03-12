@@ -1,0 +1,37 @@
+{
+  "author": "Aron Kornhall <arokor@kornhall.se>",
+  "name": "pararr.js",
+  "description": "Parallel computing for Node",
+  "keywords": [
+    "parallel",
+    "computing",
+    "multi core",
+    "functional",
+    "array",
+	"functions"
+  ],
+  "version": "0.0.2",
+  "homepage": "https://github.com/arokor/pararr.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/arokor/pararr.js.git"
+  },
+  "bugs": "https://github.com/arokor/pararr.js/issues",
+  "main": "./lib/pararr.js",
+  "scripts": {
+    "test": "nodeunit test"
+  },
+  "engines": {
+    "node": "~0.6.6"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "nodeunit": "0.7.x"
+  }
+  "licences" : [
+    {
+      "type" : "MIT License",
+      "url" : "https://github.com/arokor/pararr.js/blob/master/license.txt"
+    }
+  ]
+}
