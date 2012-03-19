@@ -1,4 +1,4 @@
-//Nodeunit tests for Pararr.js
+// Nodeunit tests for Pararr.js
 // Run with:
 //  >nodeunit test (in parent dir)
 
