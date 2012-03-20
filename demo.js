@@ -72,7 +72,12 @@ p.map(arr, fac, function(err, res) {
 					return acc + val;
 				});
 				console.log('Sum of factorials: ' + facsum);
-				p.destroy(); //Cleanup
+				
+				// Parallel sorting
+				p.sort([8,6,9,4,7,4,2,0,1,3,2], function(err, res) {
+					console.log('Sorted array: ' + res);
+					p.destroy(); //Cleanup
+				});
 			}
 		);
 	});	

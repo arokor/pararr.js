@@ -53,6 +53,7 @@ To run benchmark:
 * [parallel](#parallel)
 * [map](#map)
 * [filter](#filter)
+* [sort](#sort)
 * [destroy](#destroy)
 
 ##Considerations
@@ -120,6 +121,19 @@ __Arguments__
 
 ---------------------------------------
 
+<a name="sort"/>
+### sort( arr, comp(a,b), callback(err, result) )
+  
+Sort the array arr
+
+__Arguments__
+
+    arr      {Array} input array
+    comp     {Function} Comparator with the same interface as for native sort
+    callback {Function} Callback called when finished.
+
+---------------------------------------
+
 <a name="destroy"/>
 ### destroy()
   
@@ -131,6 +145,9 @@ Free all resources (kill workers)
 Run tests with nodeunit:
 
      nodeunit test
+
+##Roadmap
+* Implement heuristic to autumatically detect whether parallel execution will be faster
      
 ##License 
 (MIT License)

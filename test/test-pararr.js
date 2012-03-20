@@ -213,6 +213,7 @@ exports.init = {
 	}
 };
 
+// Test exec
 exports.exec = {
 	testExecError : function(test) {
 		p.exec(function(a) { throw Error('test'); }, 4, function(err, act) {
@@ -277,7 +278,6 @@ exports.exec = {
 				});
 		});
 	},
-
 	testParallelExec : function(test) {
 		var f0 = function(a) { return 123-20+20+a-a; },
 			f1 = function(a) { return 123+a-a; },
@@ -310,7 +310,6 @@ exports.exec = {
 			cb();
 		});
 	},
-
 	testParallel : function(test) {
 		var a = [123,234,345,456],
 			f = function(a) {
@@ -387,6 +386,89 @@ exports.exec = {
 				test.done();
 			}
 		);	
+	}
+};
+
+// Test sort
+exports.sort = {
+	testInvalidInput: function(test) {
+		p.sort(null, function(err) {
+			test.ok(err, 'Expected error');
+			p.sort([1,2,3], null, function(err) {
+				test.ok(err, 'Expected error');
+				test.throws(function() {
+					p.sort([1,2,3]);
+				}, 'Expected exception');
+				test.done();
+			});
+		});
+	},
+	testSortInts: function(test) {
+		var arr = [1,6,5,9,12,5,473,5,4,23,5,89,15,19,3,7,6,8,42,15,9,878,3,21,456],
+			comp = function(a,b) { return a-b; }, // Comparator
+			exp = arr.slice().sort(comp);
+
+		p.sort(arr, comp, function(err, act) {
+			test.ifError(err);
+			test.ok(arrays_equal(act, exp), 'Expected equal sorted arrays');
+			test.done();
+		});
+	},
+	testSortStrings: function(test) {
+		var arr = ['abc', 'fr', 'jkl', 'xcc', 'zh', 'nhz', 'oeo', 'nh', 'r4e'],
+			exp = arr.slice().sort();
+
+		p.sort(arr, function(err, act) {
+			test.ifError(err);
+			test.ok(arrays_equal(act, exp), 'Expected equal sorted arrays');
+			test.done();
+		});
+	},
+	testDefaultComparator: function(test) {
+		var arr = [9,1,556,675,2,132,4,1,25,71,9,18,4,16,123,3,4,1,6,28,1],
+			exp = arr.slice().sort();
+
+		p.sort(arr, function(err, act) {
+			test.ifError(err);
+			test.ok(arrays_equal(act, exp), 'Expected equal sorted arrays');
+			test.done();
+		});
+	},
+	testTinyArray: function(test) {
+		var arr = [9,5],
+			exp = arr.slice().sort();
+
+		p.sort(arr, function(err, act) {
+			test.ifError(err);
+			test.ok(arrays_equal(act, exp), 'Expected equal sorted arrays');
+			test.done();
+		});
+	},
+	testMixedArray: function(test) {
+		var arr = [9,'/*-',8,null,'a','5','x','d',4],
+			exp = arr.slice().sort();
+
+		p.sort(arr, function(err, act) {
+			test.ifError(err);
+			test.ok(arrays_equal(act, exp), 'Expected equal sorted arrays');
+			test.done();
+		});
+	},
+	testLargeArray: function(test) {
+		var arr = [],
+			exp,
+			i;
+
+		for(i=0; i<100000; i++) {
+			arr[i] = Math.floor(Math.random() * 1000);
+		}
+
+		exp = arr.slice().sort();
+		p.sort(arr, function(err, act) {
+			test.ifError(err);
+			test.ok(arrays_equal(act, exp), 'Expected equal sorted arrays');
+			test.done();
+		});
 	}
 };
 

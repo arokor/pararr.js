@@ -99,66 +99,117 @@ function benchmarkArrFunc(op, arrLen, iter, iterName, cb) {
 	});
 }
 
+function benchmarkParallel(cb) {
+	// Benchmark parallel
+	var t1 = createTimer(),
+		t2 = createTimer(), //Timers
+		x = 12345678912345678; 
+	
+	p.init();
+	console.log('\nBenchmarking parallel (this may take some time)');
+
+	// Sequential execution of 4 isPrime
+	t1.start();
+	isPrime(x);
+	isPrime(x);
+	isPrime(x);
+	isPrime(x);
+	t1.stop();
+
+	console.log('Sequential execution: ' + t1.time() + 'ms');
+
+	// Parallel execution of 4 isPrime
+	t2.start();
+	p.parallel(
+		[
+			{
+				func: isPrime,
+				par: x
+			},
+			{
+				func: isPrime,
+				par: x
+			},
+			{
+				func: isPrime,
+				par: x
+			},
+			{
+				func: isPrime,
+				par: x
+			}
+		],
+
+		// Callback
+		function(err, result) {
+			t2.stop();
+			console.log('Parallel execution: ' + t2.time() + 'ms' + (t2.time() < t1.time() ? ' - faster' : ' - slower'));
+			
+			cb();
+		}
+	);
+}
+
+function benchmarkSort(cb) {
+	var arr = [],
+		exp,
+		i, j,
+		N = 10000,
+		alphabet = 'abcdefghijklmnopqrstuvwxyz',
+
+		t1 = createTimer(),
+		t2 = createTimer(),
+		comp = function(a,b) {
+			if (a < b) {
+				return -1;
+			} else if (a > b) {
+				return 1;
+			} else {
+				return 0;
+			}
+		};
+
+	console.log('\nBenchmarking sort()');
+	
+	// Create demo data
+	for(i=0; i<N; i++) {
+		arr[i] = ''
+		for(j=0; j<300; j++) { // Very long words = Time consuming comparition = good use case
+			arr[i] += alphabet[Math.floor(Math.random() * alphabet.length)];
+		}
+	}
+
+	// Native sort
+	t1.start();
+	exp = arr.slice().sort();
+	t1.stop();
+	console.log('Native sort: ' + t1.time() + 'ms');
+	
+	// Parallel sort
+	t2.start();
+	p.sort(arr, function(err, act) {
+		t2.stop();
+		
+		console.log('Pararr sort: ' + t2.time() + 'ms' + (t2.time() < t1.time() ? ' - faster' : ' - slower'));
+		if (!arrays_equal(exp,act)) {
+			console.log('ERROR: Arrays are not equal');
+		}
+		cb();
+	});
+}
+
+
+// Run the benchmarks
 benchmarkArrFunc('map', 10000, fac, 'factorial', function() {
 	benchmarkArrFunc('map', 10000, x2, 'x^2', function() {
 		benchmarkArrFunc('filter', 100000, isPrime, 'isPrime', function() {
 			benchmarkArrFunc('filter', 100000, isEven, 'isEven', function() {
-				// Benchmark parallel
-				var t1 = createTimer(),
-					t2 = createTimer(), //Timers
-					x = 12345678912345678; 
-				
-				p.init();
-				console.log('\nBenchmarking parallel (this may take some time)');
-
-				// Sequential execution of 4 isPrime
-				t1.start();
-				isPrime(x);
-				isPrime(x);
-				isPrime(x);
-				isPrime(x);
-				t1.stop();
-
-				console.log('Sequential execution: ' + t1.time() + 'ms');
-
-
-				// Parallel execution of 4 isPrime
-				t2.start();
-				p.parallel(
-					[
-						{
-							func: isPrime,
-							par: x
-						},
-						{
-							func: isPrime,
-							par: x
-						},
-						{
-							func: isPrime,
-							par: x
-						},
-						{
-							func: isPrime,
-							par: x
-						}
-					],
-
-					// Callback
-					function(err, result) {
-						t2.stop();
-						console.log('Parallel execution: ' + t2.time() + 'ms' + (t2.time() < t1.time() ? ' - faster' : ' - slower'));
-						
+				benchmarkParallel(function() {
+					benchmarkSort(function() {
 						p.destroy(); // Cleanup
-					}
-				);
+					});
+				});
 			});
 		});
 	});
 });
-
-
-
-
-
-
