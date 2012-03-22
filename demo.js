@@ -4,6 +4,9 @@
 // Output:
 //  >Parallel map returned: 1,2,6,24,120,720,5040,40320,362880,3628800
 //  >Parallel map returned: 1,2,3,5,7
+//  >Sum of factorials: 5910
+//  >Sorted array: 0,1,2,2,3,4,4,6,7,8,9
+
 
 var p = require('./lib/pararr'),
 
