@@ -11,16 +11,18 @@ function arrays_equal(a,b) {
 
 // Test map
 exports.map = {
-	testInvalidInput: function (test) {
+	testInvalidInput: function(test) {
 		var arr;
 		arr = [1,2,3,4,5,6];
 		
 		test.expect(3);
 		p.map(arr, 'no strings allowed', function(err, act) {
-			test.ok(err && typeof act === 'undefined', 'Expected error when passing in string instead of function to map');
+			test.ok(err && typeof act === 'undefined',
+				'Expected error when passing in string instead of function to map');
 			
 			p.map({}, function(a){return a*2;}, function(err, act) {
-				test.ok(err && typeof act === 'undefined', 'Expected error when passing in object instead of array to map');
+				test.ok(err && typeof act === 'undefined',
+					'Expected error when passing in object instead of array to map');
 				
 				test.throws(function() {
 					p.map(arr, function(a){return a*2;});
@@ -30,7 +32,7 @@ exports.map = {
 			});
 		});
 	},
-	testMany: function (test) {
+	testMany: function(test) {
 		var iter = function(a){return a*2;},
 			exp;
 		
@@ -59,7 +61,7 @@ exports.map = {
 			});
 		});
 	},
-	testSimultaneousCalls: function (test) {
+	testSimultaneousCalls: function(test) {
 		var iter = function(a){return a*2;},
 			arr1 = [1,2,3,6,9,1,3,5,1,7,6,1,2,6,1,2,5,6,1,5,1,3,1,8,9,7,8,6,5,1,3,5,1,5,6,5,1,9,7,5,6,5,1,5,3,2,1,5,61,5,6,8,48,9,4,89,8,4,56,5,1,3,2,2],
 			arr2 = [5,6,7,8,9,9,5,3,1,0,1,1,5,5,6,4,9,7,2,4,2,1,5,6,6,4,5,6,561,5,61,56,1,53,2,1,59,8,7,56,5,1,53,21,5,9,5,41,56,5,4789,5,53,1,23,2,3],
@@ -88,21 +90,34 @@ exports.map = {
 		p.map(arr1, iter, createCallback(exp1));
 		p.map(arr2, iter, createCallback(exp2));
 		p.map(arr3, iter, createCallback(exp3));
+	},
+	testLazyInit: function(test) {
+		var iter = function(a) { return a + 1; },
+			arr = [1,2,3],
+			exp = arr.map(iter);
+
+		p.destroy(); // Free all resouces
+		p.map(arr, iter, function(err, act) {
+			test.ok(arrays_equal(act, exp), 'Expected ' + exp + ' but got ' + act);
+			test.done();
+		});
 	}
 }
 
 // Test filter
 exports.filter = {
-	testInvalidInput: function (test) {
+	testInvalidInput: function(test) {
 		var arr;
 		arr = [1,2,3,4,5,6];
 		
 		test.expect(3);
 		p.map(arr, 'no strings allowed', function(err, act) {
-			test.ok(err && typeof act === 'undefined', 'Expected error when passing in string instead of function to map');
+			test.ok(err && typeof act === 'undefined',
+				'Expected error when passing in string instead of function to map');
 			
 			p.map({}, function(a){return a*2;}, function(err, act) {
-				test.ok(err && typeof act === 'undefined', 'Expected error when passing in object instead of array to map');
+				test.ok(err && typeof act === 'undefined',
+					'Expected error when passing in object instead of array to map');
 				
 				test.throws(function() {
 					p.map(arr, function(a){return a*2;});
@@ -112,7 +127,7 @@ exports.filter = {
 			});
 		});
 	},
-	testMany: function (test) {
+	testMany: function(test) {
 		var iter = function(a){return a % 2 === 0;},
 			exp;
 		
@@ -141,7 +156,7 @@ exports.filter = {
 			});
 		});
 	},
-	testSimultaneousCalls: function (test) {
+	testSimultaneousCalls: function(test) {
 		var iter = function(a){return a % 2 === 0;},
 			arr1 = [1,2,3,6,9,1,3,5,1,7,6,1,2,6,1,2,5,6,1,5,1,3,1,8,9,7,8,6,5,1,3,5,1,5,6,5,1,9,7,5,6,5,1,5,3,2,1,5,61,5,6,8,48,9,4,89,8,4,56,5,1,3,2,2],
 			arr2 = [5,6,7,8,9,9,5,3,1,0,1,1,5,5,6,4,9,7,2,4,2,1,5,6,6,4,5,6,561,5,61,56,1,53,2,1,59,8,7,56,5,1,53,21,5,9,5,41,56,5,4789,5,53,1,23,2,3],
@@ -170,13 +185,24 @@ exports.filter = {
 		p.filter(arr1, iter, createCallback(exp1));
 		p.filter(arr2, iter, createCallback(exp2));
 		p.filter(arr3, iter, createCallback(exp3));
+	},
+	testLazyInit: function(test) {
+		var iter = function(a) { return a === 2; },
+			arr = [1,2,3],
+			exp = arr.filter(iter);
+
+		p.destroy(); // Free all resouces
+		p.filter(arr, iter, function(err, act) {
+			test.ok(arrays_equal(act, exp), 'Expected ' + exp + ' but got ' + act);
+			test.done();
+		});
 	}
 }
 
 
 // Test many initializations
 exports.init = {
-	testMany: function (test) {
+	testMany: function(test) {
 		var iter = function(a){return a % 2 === 0;},
 			exp;
 		
@@ -386,7 +412,31 @@ exports.exec = {
 				test.done();
 			}
 		);	
+	},
+	testLazyInit: function(test) {
+		p.destroy(); // Free all resouces
+
+		p.parallel(
+			[
+				{
+					func : function(a) { return a*2; },
+					par : 1
+				},
+				{
+					func : function(a) { return a*4; },
+					par : 1
+				},
+			],
+
+			// Callback
+			function(result) {
+				test.strictEqual(result[0], 2, 'Incorrect parallel result');
+				test.strictEqual(result[1], 4, 'Incorrect parallel result');
+				test.done();
+			}
+		);	
 	}
+
 };
 
 // Test sort
@@ -469,11 +519,21 @@ exports.sort = {
 			test.ok(arrays_equal(act, exp), 'Expected equal sorted arrays');
 			test.done();
 		});
+	},
+	testLazyInit: function(test) {
+		p.destroy(); // Free all resouces
+
+		p.sort([1,6,8,7,3,5,9,4,2], function(err, act) {
+			test.ifError(err);
+			test.ok(arrays_equal(act, [1,2,3,4,5,6,7,8,9]), 'Expected equal sorted arrays');
+			test.done();
+		});
 	}
+
 };
 
 //Finaly call destroy to free resources
-exports.finalize = function (test) {
+exports.finalize = function(test) {
 	p.destroy();
 	test.done();
 };

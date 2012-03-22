@@ -1,4 +1,4 @@
-// Benchmark of Pararr.js with different iterators
+// Benchmark of Pararr.js
 // Run with:
 //  >node benchmark.js
 
@@ -6,7 +6,9 @@ var p = require('./lib/pararr'),
 	arr = [],
 	i,
 	
-	//Funcitons for map
+	// The factorial function
+	// For large numbers this is quite time consuming and hence a good candidate
+	// for parallelization
 	fac = function(a) {
 		return (function facI(a) {
 			if (a <= 1) {
@@ -15,14 +17,19 @@ var p = require('./lib/pararr'),
 			return facI(a - 1);
 		})(a);
 	},
+
+	// Simple square function
 	x2 = function(a) {
 		return a * a;
 	},
 	
-	//Functions for filter
+	// Simple funciton that checks if a number is even
 	isEven = function(a) {
 		return a % 2 === 0;
 	},
+
+	// Naive implementation of a primality check. Also a good candidate for
+	// Parallelization
 	isPrime = function(a) {
 		var i;
 		if (a <= 2) {
@@ -36,6 +43,7 @@ var p = require('./lib/pararr'),
 		return true;
 	},
 	
+	// Simple timer
 	timerPrototype = {
 		start : function() {
 			this.begin = new Date();
@@ -60,7 +68,7 @@ function arrays_equal(a,b) {
 	return !!a && !!b && !(a<b || b<a);
 }
 
-// Measure and output time required for paralell and normal array operations
+// Benchmark paralell and normal array operations
 function benchmarkArrFunc(op, arrLen, iter, iterName, cb) {
 	var t1, t2, //Timers
 		r1, r2, //Results
@@ -87,7 +95,8 @@ function benchmarkArrFunc(op, arrLen, iter, iterName, cb) {
 	t2 = createTimer();
 	t2.start();
 	p[op](arr, iter, function(err, act) {
-		console.log('  Pararr ' + op + ': ' + t2.stop() + 'ms' + (t2.time() < t1.time() ? ' - faster' : ' - slower'));
+		console.log('  Pararr ' + op + ': ' + t2.stop() + 'ms' +
+			(t2.time() < t1.time() ? ' - faster' : ' - slower'));
 		r2 = act;
 		if (!arrays_equal(r1,r2)) {
 			console.log('  ERROR: Arrays are not equal');
@@ -99,11 +108,12 @@ function benchmarkArrFunc(op, arrLen, iter, iterName, cb) {
 	});
 }
 
+// Benchmark the parallel execution using pararr in comparision with sequential
 function benchmarkParallel(cb) {
 	// Benchmark parallel
 	var t1 = createTimer(),
-		t2 = createTimer(), //Timers
-		x = 12345678912345678; 
+		t2 = createTimer(), // Timers
+		x = 12345678912345678; // A number big enough to make a difference
 	
 	p.init();
 	console.log('\nBenchmarking parallel (this may take some time)');
@@ -143,13 +153,15 @@ function benchmarkParallel(cb) {
 		// Callback
 		function(err, result) {
 			t2.stop();
-			console.log('Parallel execution: ' + t2.time() + 'ms' + (t2.time() < t1.time() ? ' - faster' : ' - slower'));
+			console.log('Parallel execution: ' + t2.time() + 'ms' + 
+				(t2.time() < t1.time() ? ' - faster' : ' - slower'));
 			
 			cb();
 		}
 	);
 }
 
+// Benchmark thes parallel sort in comparision to the native sort
 function benchmarkSort(cb) {
 	var arr = [],
 		exp,
@@ -159,6 +171,8 @@ function benchmarkSort(cb) {
 
 		t1 = createTimer(),
 		t2 = createTimer(),
+
+		// The comparator that we will use
 		comp = function(a,b) {
 			if (a < b) {
 				return -1;
@@ -199,7 +213,7 @@ function benchmarkSort(cb) {
 }
 
 
-// Run the benchmarks
+// Run the benchmarks one after another
 benchmarkArrFunc('map', 10000, fac, 'factorial', function() {
 	benchmarkArrFunc('map', 10000, x2, 'x^2', function() {
 		benchmarkArrFunc('filter', 100000, isPrime, 'isPrime', function() {
