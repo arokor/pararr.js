@@ -111,7 +111,7 @@ __Arguments__
 <a name="filter"/>
 ### filter( arr, iter(a), callback(err, result) )
   
-Filter an an array
+Filter an array
 
 __Arguments__
 
